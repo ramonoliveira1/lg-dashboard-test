@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'DashboardController@index')->name('dashboard');
+
+Route::prefix('analysis')->name('analysis.')->group(function () {
+    Route::get('/status', 'AnalysisController@status')->name('status');
+    Route::post('/configure', 'AnalysisController@configure')->name('configure');
+    Route::post('/generate', 'AnalysisController@generate')->name('generate');
 });
