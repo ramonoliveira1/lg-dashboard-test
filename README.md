@@ -1,62 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# LG Electronics – Dashboard de Produção (desafio técnico)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+> **Nota ao recrutador:**
+> Este projeto foi desenvolvido exclusivamente para avaliação no processo seletivo da LG Electronics. O objetivo foi demonstrar domínio de arquitetura, testes e boas práticas em Laravel, indo além do necessário para um CRUD simples. Caso fosse um projeto real, pontual e de escopo restrito, a abordagem seria mais pragmática e focada em velocidade de entrega. Aqui, a intenção foi mostrar como estruturaria um projeto escalável, testável e pronto para crescer, caso fosse necessário atender demandas futuras ou equipes maiores.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Motivação da feature de IA
 
-## Laravel Sponsors
+Durante a leitura da descrição da vaga e na entrevista, ficou claro que a empresa valoriza soluções com inteligência artificial e automação de análises. Por isso, incluí uma feature de IA: o serviço `GeminiService`, capaz de gerar observações automáticas sobre os dados de produção. Optei por integrar o **Gemini** (Google) ao invés da OpenAI, pois o Gemini oferece um modelo gratuito, facilitando a demonstração sem custos para o avaliador e sem necessidade de chave paga.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+Dashboard de eficiência de produção da **Planta A** (dados de exemplo: janeiro de 2026). O projeto foi desenhado para servir como prova de conceito e vitrine de boas práticas — a arquitetura robusta é intencional para demonstrar padrões como Service Layer, Repositories, Interfaces, injeção de dependência e testes unitários/feature.
 
-## Contributing
+## Stack principal
+- Backend: PHP 7.4 / Laravel 7
+- Banco: MySQL 8
+- Frontend: Blade + Tailwind CSS (CDN) + Chart.js
+- Testes: PHPUnit
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+## Por que uma arquitetura robusta?
+- O objetivo foi mostrar domínio de padrões e práticas que facilitam manutenção, testes e evolução do sistema.
+- Em projetos reais, separar responsabilidades (service, repository, interface) é fundamental para escalar e trabalhar em equipe.
+- Aqui você encontrará exemplos práticos de:
+  - Service Layer (`app/Services/*`) para regras de negócio e queries testáveis
+  - Repositories e interfaces para desacoplar persistência
+  - Abstração de integrações externas via interfaces (ex.: `GeminiServiceInterface`)
+  - Testes unitários e de integração (feature tests)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Arquitetura (resumo)
 
-## Security Vulnerabilities
+app/
+├── Productivity.php                    # Model – constantes de linhas, scopes e accessors
+├── Services/
+│   ├── ProductivityService.php         # Regras de negócio / agregações
+│   └── GeminiService.php               # Integração com provedor de IA (implementação)
+├── Repositories/                       # Camada de persistência (interface + impl.)
+└── Http/Controllers/
+    └── DashboardController.php         # Recebe request → Service → View
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+As linhas de produto são definidas como constantes em `Productivity` (`LINE_*` e `PRODUCT_LINES`) para garantir consistência entre seeders, validações e views.
 
-## License
+Feature de IA
+- Existe um serviço chamado `GeminiService` (e sua interface `GeminiServiceInterface`) que ilustra como integrar um provedor de modelos de linguagem para gerar análises ou observações automáticas sobre os dados de produção. Principais características:
+  - Abstração via interface: você pode trocar o provedor (ou mocká-lo) sem alterar a lógica da aplicação.
+  - Implementação pensada para ser facilmente testável (os testes unitários mockam a integração).
+  - Uso típico: gerar um resumo textual ou insights (ex.: "A linha X teve queda de eficiência nos últimos 3 dias") com base nas métricas agregadas pela `ProductivityService`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Importante: nesta demo a integração com IA é demonstrativa — não há credenciais em repositório. Em produção, configure a chave/endpoint via `.env` e implemente um adaptador seguro.
+
+Pré-requisitos
+- Docker & Docker Compose (recomendado para manter parity com ambiente de desenvolvimento)
+- Ou: PHP 7.4+, Composer e MySQL 8 para rodar localmente
+
+Rodando com Docker Compose (recomendado)
+
+1) Clone o repo e entre na pasta:
+
+```bash
+git clone <url-do-repositorio>
+cd lg-dashboard-test
+```
+
+2) Copie o arquivo de ambiente (já preparado para Docker) e suba os containers:
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+3) Execute comandos dentro do container `app` para instalar dependências, gerar a chave da aplicação, rodar migrations e popular o banco:
+
+```bash
+docker compose exec app composer install --no-interaction --prefer-dist
+docker compose exec app php artisan key:generate --force
+docker compose exec app php artisan migrate --force
+docker compose exec app php artisan db:seed --force
+```
+
+4) Abra no navegador: http://localhost:8000
+
+Para parar os containers:
+
+```bash
+docker compose down            # mantém os volumes
+docker compose down -v         # limpa volumes (inclui dados do MySQL)
+```
+
+Instalação local (sem Docker)
+
+```bash
+git clone <url-do-repositorio>
+cd lg-dashboard-test
+composer install
+cp .env.example .env
+php artisan key:generate
+# ajuste as variáveis de DB no .env para apontar ao seu MySQL local
+php artisan migrate
+php artisan db:seed
+php artisan serve
+```
+
+Banco de dados e seed
+- A migration `create_productivities_table` cria a tabela `productivities` com índices para plant/product_line e data.
+- O seeder popula registros para todos os dias úteis de janeiro de 2026 — ideal para testar gráficos e filtros.
+
+Fórmula de eficiência
+
+Eficiência (%) = ((Produzido − Defeitos) / Produzido) × 100
+
+Intervalos de observação
+- ≥ 95%: Ótimo
+- 85% – 94,9%: Regular
+- < 85%: Crítico
+
+Testes
+
+Execute a suíte de testes com:
+
+```bash
+docker compose exec app vendor/bin/phpunit
+# ou, localmente:
+vendor/bin/phpunit
+```
+
+A suíte cobre:
+- Cálculo de eficiência (casos borda: zero, 100%, arredondamento, alto volume)
+- Constantes do model (`PRODUCT_LINES`, `LINE_*`)
+- Validações e accessors
+- Feature tests da rota principal (`/`)
+
+
+## Notas finais e boas práticas demonstradas
+- Código organizado para ser fácil de testar e estender.
+- Integrações (como a de IA) são desacopladas por interfaces para permitir substituição e mock nos testes.
+- Uso de Seeders e Factories para dados previsíveis em testes e demo.
+- Arquitetura pensada para um time: separar controllers (HTTP), services (negócio) e repositórios (persistência).
+
+---
+
+Fique à vontade para perguntar qualquer detalhe técnico, decisão de arquitetura ou pedir exemplos de código/testes específicos.
+
 
