@@ -63,7 +63,7 @@ Rodando com Docker Compose (recomendado)
 1) Clone o repo e entre na pasta:
 
 ```bash
-git clone <url-do-repositorio>
+git clone git@github.com:ramonoliveira1/lg-dashboard-test.git
 cd lg-dashboard-test
 ```
 
